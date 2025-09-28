@@ -239,7 +239,9 @@ export const DynamicVirtualScrollList = <T,>({
         {visibleItems.map(({ item, index, top }) => (
           <div
             key={index}
-            ref={(el) => (itemRefs.current[index] = el)}
+            ref={(el) => {
+              itemRefs.current[index] = el;
+            }}
             style={{
               position: 'absolute',
               top,

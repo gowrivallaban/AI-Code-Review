@@ -8,7 +8,7 @@ import {
   duplicateTemplate
 } from '../templateUtils';
 import { templateService } from '../../services';
-import { ReviewTemplate } from '../../types';
+import type { ReviewTemplate } from '../../types';
 
 // Mock the template service
 vi.mock('../../services', () => ({

@@ -1,7 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { tomorrow } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import SyntaxHighlighter from 'react-syntax-highlighter';
 import type { ReviewTemplate, TemplateError } from '../types';
 import { templateService } from '../services';
 import { HelpIcon } from './Tooltip';
@@ -71,7 +70,7 @@ export function TemplateEditor({
         rules: parsed.rules || prev.rules,
         criteria: parsed.criteria || prev.criteria
       }));
-    } catch (error) {
+    } catch {
       // Don't update structure if parsing fails, just update content
       setEditingTemplate(prev => ({ ...prev, content }));
     }
@@ -103,7 +102,7 @@ export function TemplateEditor({
   }, [editingTemplate]);
 
   // Handle form field changes
-  const handleFieldChange = (field: keyof ReviewTemplate, value: any) => {
+  const handleFieldChange = (field: keyof ReviewTemplate, value: string) => {
     setEditingTemplate(prev => ({ ...prev, [field]: value }));
     
     // Clear validation error for this field
@@ -344,13 +343,10 @@ export function TemplateEditor({
                 components={{
                   code({ className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '');
-                    const { ref, ...restProps } = props;
                     return match ? (
                       <SyntaxHighlighter
-                        style={tomorrow as any}
                         language={match[1]}
                         PreTag="div"
-                        {...restProps}
                       >
                         {String(children).replace(/\n$/, '')}
                       </SyntaxHighlighter>

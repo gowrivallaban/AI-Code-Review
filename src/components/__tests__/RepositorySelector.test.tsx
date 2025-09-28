@@ -103,7 +103,7 @@ describe('RepositorySelector', () => {
         avatar_url: 'https://github.com/testuser.png',
       },
       private: false,
-      description: null,
+      description: undefined,
       html_url: 'https://github.com/testuser/another-repo',
       clone_url: 'https://github.com/testuser/another-repo.git',
       default_branch: 'develop',

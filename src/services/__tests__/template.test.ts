@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TemplateService } from '../template';
-import { ReviewTemplate, TemplateError } from '../../types';
+import type { ReviewTemplate, TemplateError } from '../../types';
 
 // Mock localStorage
 const localStorageMock = {

@@ -20,7 +20,7 @@ export const lazyLoadService = async <T>(
 
   try {
     const module = await importFn();
-    const service = 'default' in module ? module.default : module;
+    const service = 'default' in (module as any) ? (module as any).default : module as any;
     moduleCache.set(cacheKey, service);
     return service;
   } catch (error) {
@@ -83,7 +83,7 @@ export const createLazyComponent = <T extends React.ComponentType<any>>(
             )
           )
       },
-      React.createElement(LazyComponent, { ...props, ref })
+      React.createElement(LazyComponent as any, { ...props, ref })
     )
   );
 };

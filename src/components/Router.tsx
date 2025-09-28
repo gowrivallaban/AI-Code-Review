@@ -200,7 +200,12 @@ const AppRouter: React.FC = () => {
 
 export const Router: React.FC = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true
+      }}
+    >
       <AppRouter />
     </BrowserRouter>
   );
