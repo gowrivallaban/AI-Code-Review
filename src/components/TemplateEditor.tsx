@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { tomorrow } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import type { ReviewTemplate, TemplateError } from '../types';
 import { templateService } from '../services';
 import { HelpIcon } from './Tooltip';
