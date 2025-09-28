@@ -24,7 +24,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
-                  GitHub PR Review UI
+                  AI Code Review
                 </h1>
               </div>
             </div>

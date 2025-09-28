@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Base styles */
 html {
@@ -6,8 +8,7 @@ html {
 }
 
 body {
-  background-color: #f9fafb;
-  color: #111827;
+  @apply bg-gray-50 text-gray-900;
 }
 
 /* Custom scrollbar styles */
