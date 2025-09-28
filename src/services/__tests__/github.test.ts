@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
 import { GitHubService } from '../github';
-import { Repository, PullRequest, ReviewComment, GitHubUser } from '../../types';
+import type { Repository, PullRequest, ReviewComment, GitHubUser } from '../../types';
 
 // Mock axios completely
 vi.mock('axios', () => {
@@ -27,6 +27,7 @@ const mockedAxios = vi.mocked(axios);
 
 describe('GitHubService', () => {
   let service: GitHubService;
+  let mockAxiosInstance: any;
   const mockToken = 'ghp_test_token_123';
   const mockUser: GitHubUser = {
     id: 1,
@@ -39,11 +40,21 @@ describe('GitHubService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     
-    mockedAxios.get.mockResolvedValue({ data: mockUser });
-    mockedAxios.isAxiosError.mockImplementation((error) => {
+    mockAxiosInstance = {
+      get: vi.fn(),
+      post: vi.fn(),
+      interceptors: {
+        request: { use: vi.fn() },
+        response: { use: vi.fn() },
+      },
+    };
+    
+    (mockedAxios.create as any).mockReturnValue(mockAxiosInstance);
+    (mockedAxios.get as any).mockResolvedValue({ data: mockUser });
+    (mockedAxios.isAxiosError as any).mockImplementation((error: any) => {
       return error && typeof error === 'object' && 'response' in error;
     });
-    
+
     service = new GitHubService();
   });
 
@@ -53,7 +64,7 @@ describe('GitHubService', () => {
 
   describe('authenticate', () => {
     it('should authenticate successfully with valid token', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: mockUser });
+      (mockedAxios.get as any).mockResolvedValueOnce({ data: mockUser });
 
       await service.authenticate(mockToken);
 
@@ -80,8 +91,8 @@ describe('GitHubService', () => {
       const error = {
         response: { status: 401 },
       };
-      mockedAxios.get.mockRejectedValueOnce(error);
-      mockedAxios.isAxiosError.mockReturnValueOnce(true);
+      (mockedAxios.get as any).mockRejectedValueOnce(error);
+      (mockedAxios.isAxiosError as any).mockReturnValueOnce(true);
 
       await expect(service.authenticate(mockToken)).rejects.toMatchObject({
         type: 'auth',
@@ -94,8 +105,8 @@ describe('GitHubService', () => {
       const error = {
         response: { status: 403 },
       };
-      mockedAxios.get.mockRejectedValueOnce(error);
-      mockedAxios.isAxiosError.mockReturnValueOnce(true);
+      (mockedAxios.get as any).mockRejectedValueOnce(error);
+      (mockedAxios.isAxiosError as any).mockReturnValueOnce(true);
 
       await expect(service.authenticate(mockToken)).rejects.toMatchObject({
         type: 'auth',
@@ -106,8 +117,8 @@ describe('GitHubService', () => {
 
     it('should throw AuthError for network errors', async () => {
       const error = new Error('Network Error');
-      mockedAxios.get.mockRejectedValueOnce(error);
-      mockedAxios.isAxiosError.mockReturnValueOnce(false);
+      (mockedAxios.get as any).mockRejectedValueOnce(error);
+      (mockedAxios.isAxiosError as any).mockReturnValueOnce(false);
 
       await expect(service.authenticate(mockToken)).rejects.toMatchObject({
         type: 'auth',
@@ -134,14 +145,13 @@ describe('GitHubService', () => {
 
     beforeEach(async () => {
       // Authenticate first
-      mockedAxios.get.mockResolvedValueOnce({ data: mockUser });
+      (mockedAxios.get as any).mockResolvedValueOnce({ data: mockUser });
       await service.authenticate(mockToken);
       vi.clearAllMocks();
     });
 
     it('should fetch repositories successfully', async () => {
-      const mockAxiosInstance = mockedAxios.create();
-      mockAxiosInstance.get = vi.fn().mockResolvedValueOnce({ data: mockRepositories });
+      mockAxiosInstance.get.mockResolvedValueOnce({ data: mockRepositories });
 
       const result = await service.getRepositories();
 
@@ -157,7 +167,6 @@ describe('GitHubService', () => {
     });
 
     it('should handle pagination correctly', async () => {
-      const mockAxiosInstance = mockedAxios.create();
       const firstPage = Array(100).fill(null).map((_, i) => ({
         ...mockRepositories[0],
         id: i + 1,
@@ -165,7 +174,7 @@ describe('GitHubService', () => {
       }));
       const secondPage = [{ ...mockRepositories[0], id: 101, name: 'repo-101' }];
 
-      mockAxiosInstance.get = vi.fn()
+      mockAxiosInstance.get
         .mockResolvedValueOnce({ data: firstPage })
         .mockResolvedValueOnce({ data: secondPage });
 
@@ -232,14 +241,13 @@ describe('GitHubService', () => {
 
     beforeEach(async () => {
       // Authenticate first
-      mockedAxios.get.mockResolvedValueOnce({ data: mockUser });
+      (mockedAxios.get as any).mockResolvedValueOnce({ data: mockUser });
       await service.authenticate(mockToken);
       vi.clearAllMocks();
     });
 
     it('should fetch pull requests successfully', async () => {
-      const mockAxiosInstance = mockedAxios.create();
-      mockAxiosInstance.get = vi.fn().mockResolvedValueOnce({ data: mockPullRequests });
+      mockAxiosInstance.get.mockResolvedValueOnce({ data: mockPullRequests });
 
       const result = await service.getPullRequests('testuser/test-repo');
 
@@ -286,14 +294,13 @@ index 1234567..abcdefg 100644
 
     beforeEach(async () => {
       // Authenticate first
-      mockedAxios.get.mockResolvedValueOnce({ data: mockUser });
+      (mockedAxios.get as any).mockResolvedValueOnce({ data: mockUser });
       await service.authenticate(mockToken);
       vi.clearAllMocks();
     });
 
     it('should fetch pull request diff successfully', async () => {
-      const mockAxiosInstance = mockedAxios.create();
-      mockAxiosInstance.get = vi.fn().mockResolvedValueOnce({ data: mockDiff });
+      mockAxiosInstance.get.mockResolvedValueOnce({ data: mockDiff });
 
       const result = await service.getPullRequestDiff('testuser/test-repo', 1);
 
@@ -346,14 +353,13 @@ index 1234567..abcdefg 100644
 
     beforeEach(async () => {
       // Authenticate first
-      mockedAxios.get.mockResolvedValueOnce({ data: mockUser });
+      (mockedAxios.get as any).mockResolvedValueOnce({ data: mockUser });
       await service.authenticate(mockToken);
       vi.clearAllMocks();
     });
 
     it('should post review comments successfully', async () => {
-      const mockAxiosInstance = mockedAxios.create();
-      mockAxiosInstance.post = vi.fn().mockResolvedValueOnce({ data: {} });
+      mockAxiosInstance.post.mockResolvedValueOnce({ data: {} });
 
       await service.postReviewComments('testuser/test-repo', 1, mockComments);
 
@@ -364,8 +370,7 @@ index 1234567..abcdefg 100644
     });
 
     it('should only post accepted comments', async () => {
-      const mockAxiosInstance = mockedAxios.create();
-      mockAxiosInstance.post = vi.fn().mockResolvedValueOnce({ data: {} });
+      mockAxiosInstance.post.mockResolvedValueOnce({ data: {} });
 
       await service.postReviewComments('testuser/test-repo', 1, mockComments);
 
@@ -375,9 +380,6 @@ index 1234567..abcdefg 100644
     });
 
     it('should handle empty comments array', async () => {
-      const mockAxiosInstance = mockedAxios.create();
-      mockAxiosInstance.post = vi.fn();
-
       await service.postReviewComments('testuser/test-repo', 1, []);
 
       expect(mockAxiosInstance.post).not.toHaveBeenCalled();
@@ -385,8 +387,6 @@ index 1234567..abcdefg 100644
 
     it('should handle no accepted comments', async () => {
       const rejectedComments = mockComments.map(c => ({ ...c, status: 'rejected' as const }));
-      const mockAxiosInstance = mockedAxios.create();
-      mockAxiosInstance.post = vi.fn();
 
       await service.postReviewComments('testuser/test-repo', 1, rejectedComments);
 
@@ -401,7 +401,7 @@ index 1234567..abcdefg 100644
     });
 
     it('should clear authentication', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: mockUser });
+      (mockedAxios.get as any).mockResolvedValueOnce({ data: mockUser });
       await service.authenticate(mockToken);
 
       expect(service.isAuthenticated()).toBe(true);
@@ -416,13 +416,12 @@ index 1234567..abcdefg 100644
   describe('error handling and retry logic', () => {
     beforeEach(async () => {
       // Authenticate first
-      mockedAxios.get.mockResolvedValueOnce({ data: mockUser });
+      (mockedAxios.get as any).mockResolvedValueOnce({ data: mockUser });
       await service.authenticate(mockToken);
       vi.clearAllMocks();
     });
 
     it('should handle rate limiting with retry-after header', async () => {
-      const mockAxiosInstance = mockedAxios.create();
       const rateLimitError = {
         response: {
           status: 403,
@@ -430,7 +429,7 @@ index 1234567..abcdefg 100644
         },
       };
 
-      mockAxiosInstance.get = vi.fn()
+      mockAxiosInstance.get
         .mockRejectedValueOnce(rateLimitError)
         .mockResolvedValueOnce({ data: [] });
 
@@ -447,10 +446,9 @@ index 1234567..abcdefg 100644
     });
 
     it('should handle network errors with retry', async () => {
-      const mockAxiosInstance = mockedAxios.create();
       const networkError = new Error('Network Error');
 
-      mockAxiosInstance.get = vi.fn()
+      mockAxiosInstance.get
         .mockRejectedValueOnce(networkError)
         .mockResolvedValueOnce({ data: [] });
 

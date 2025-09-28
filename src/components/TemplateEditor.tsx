@@ -344,12 +344,13 @@ export function TemplateEditor({
                 components={{
                   code({ className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '');
+                    const { ref, ...restProps } = props;
                     return match ? (
                       <SyntaxHighlighter
                         style={tomorrow as any}
                         language={match[1]}
                         PreTag="div"
-                        {...props}
+                        {...restProps}
                       >
                         {String(children).replace(/\n$/, '')}
                       </SyntaxHighlighter>

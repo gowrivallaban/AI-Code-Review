@@ -1,5 +1,5 @@
 import { templateService } from '../services';
-import { ReviewTemplate } from '../types';
+import type { ReviewTemplate } from '../types';
 
 /**
  * Utility functions for working with review templates

@@ -1,6 +1,7 @@
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios from 'axios';
+import type { AxiosInstance, AxiosError } from 'axios';
 import { apiCache, CacheKeys, CacheTTL, CacheInvalidation } from './cache';
-import {
+import type {
   GitHubServiceInterface,
   Repository,
   PullRequest,

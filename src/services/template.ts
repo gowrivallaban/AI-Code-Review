@@ -1,4 +1,4 @@
-import { ReviewTemplate, TemplateError, TemplateServiceInterface } from '../types';
+import type { ReviewTemplate, TemplateError, TemplateServiceInterface } from '../types';
 
 /**
  * Service for managing code review templates

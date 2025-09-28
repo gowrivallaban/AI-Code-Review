@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { ErrorHandler, handleError, withRetry, createRetryWrapper, createError } from '../errorHandler';
+import { handleError, withRetry, createRetryWrapper, createError } from '../errorHandler';
 import { notificationService } from '../notification';
 import type { AuthError, APIError, LLMError, TemplateError } from '../../types';
 
